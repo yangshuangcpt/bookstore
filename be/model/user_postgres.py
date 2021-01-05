@@ -6,51 +6,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, VARCHAR, TEXT
 from sqlalchemy.orm import sessionmaker, scoped_session
 import error
+import db_conn as db
+import store as st
 
-engine = create_engine('postgresql+psycopg2://postgres:Wypsz.01@localhost/bookstore', encoding='utf-8', echo=True)
-base = declarative_base()
-
-
-class User(base):
-    __tablename__ = 'user'
-    user_id = Column('user_id', TEXT, primary_key=True)
-    password = Column('password', TEXT, nullable=False)
-    balance = Column('balance', Integer, nullable=False)
-    token = Column('token', TEXT)
-    terminal = Column('terminal ', TEXT)
-
-
-class UserStore(base):
-    __tablename__ = 'user_store'
-    user_id = Column('user_id', TEXT, primary_key=True)
-    store_id = Column('store_id', TEXT, primary_key=True)
-
-
-class Store(base):
-    __tablename__ = 'store'
-    store_id = Column('store_id', Integer, primary_key=True)
-    book_id = Column('book_id', TEXT, primary_key=True)
-    book_info = Column('book_info', TEXT)
-    stock_level = Column('stock_level', Integer)
-
-
-class NewOrder(base):
-    __tablename__ = 'new_order'
-    order_id = Column('order_id', TEXT, primary_key=True)
-    user_id = Column('user_id', TEXT)
-    store_id = Column('store_id', TEXT)
-
-
-class NewOrderDetail(base):
-    __tablename__ = 'new_order_detail'
-    order_id = Column('order_id ', TEXT, primary_key=True)
-    book_id = Column('book_id', TEXT, primary_key=True)
-    count = Column('count ', Integer)
-    price = Column('price ', Integer)
-
-
-Session = sessionmaker(bind=engine)
-session = Session()
 
 
 def jwt_encode(user_id: str, terminal: str) -> str:
@@ -89,30 +47,30 @@ def register(user_id: str, password: str):
     try:
         terminal = "terminal_{}".format(str(time.time()))
         token = jwt_encode(user_id, terminal)
-        session.add(User(user_id=user_id, password=password, balance=0, token=token, terminal=terminal))
-        session.commit()
+        db.session.add(st.User(user_id=user_id, password=password, balance=0, token=token, terminal=terminal))
+        db.session.commit()
     except exc.SQLAlchemyError:
         return error.error_exist_user_id(user_id)
     return 200, "ok"
 
 
-def check_token(self, user_id: str, token: str) -> (int, str):
-    query1 = session.query(User.token).filter(User.user_id == user_id)
+def check_token( user_id: str, token: str) -> (int, str):
+    query1 = db.session.query(st.User).filter(st.User.user_id == user_id)
     row = query1.one_or_none()
     if row is None:
         return error.error_authorization_fail()
-    db_token = row[0]
+    db_token = row.token
     if not check_token(user_id, db_token, token):
         return error.error_authorization_fail()
     return 200, "ok"
 
 
 def check_password(user_id: str, password: str) -> (int, str):
-    query1 = session.query(User.password).filter(User.user_id == user_id)
+    query1 = db.session.query(st.User).filter(st.User.user_id == user_id)
     row = query1.one_or_none()
     if row is None:
         return error.error_authorization_fail()
-    if password != row[0]:
+    if password != row.password:
         return error.error_authorization_fail()
 
     return 200, "ok"
@@ -126,12 +84,12 @@ def login(user_id: str, password: str, terminal: str) -> (int, str, str):
             return code, message, ""
 
         token = jwt_encode(user_id, terminal)
-        query1 = session.query(User).filter(User.user_id == user_id).update(
-            {User.token: token, User.terminal: terminal}
+        query1 = db.session.query(st.User).filter(st.User.user_id == user_id).update(
+            {st.User.token: token, st.User.terminal: terminal}
         )
         if query1 == 0:
             return error.error_authorization_fail() + ("",)
-        session.commit()
+        db.session.commit()
     except exc.SQLAlchemyError as e:
         return 528, "{}".format(str(e)), ""
     except BaseException as e:
@@ -148,13 +106,13 @@ def logout(user_id: str, token: str) -> bool:
         terminal = "terminal_{}".format(str(time.time()))
         dummy_token = jwt_encode(user_id, terminal)
 
-        query1 = session.query(User).filter(User.user_id==user_id).update(
-            {User.token:dummy_token,User.terminal:terminal}
+        query1 = db.ession.query(st.User).filter(st.User.user_id == user_id).update(
+            {st.User.token: dummy_token, st.User.terminal: terminal}
         )
         if query1 == 0:
             return error.error_authorization_fail()
 
-        session.commit()
+        db.session.commit()
     except exc.SQLAlchemyError as e:
         return 528, "{}".format(str(e))
     except BaseException as e:
@@ -168,9 +126,9 @@ def unregister(user_id: str, password: str) -> (int, str):
         if code != 200:
             return code, message
 
-        query1 = session.query(User).filter(User.user_id==user_id).delete()
+        query1 = db.session.query(st.User).filter(st.User.user_id == user_id).delete()
         if query1 == 1:
-            session.commit()
+            db.session.commit()
         else:
             return error.error_authorization_fail()
     except exc.SQLAlchemyError as e:
@@ -178,6 +136,7 @@ def unregister(user_id: str, password: str) -> (int, str):
     except BaseException as e:
         return 530, "{}".format(str(e))
     return 200, "ok"
+
 
 def change_password(user_id: str, old_password: str, new_password: str) -> bool:
     try:
@@ -187,13 +146,13 @@ def change_password(user_id: str, old_password: str, new_password: str) -> bool:
 
         terminal = "terminal_{}".format(str(time.time()))
         token = jwt_encode(user_id, terminal)
-        query1 = session.query(User).filter(User.user_id==user_id).update(
-            {User.password:new_password,User.token:token,User.terminal:terminal}
+        query1 = db.session.query(st.User).filter(st.User.user_id == user_id).update(
+            {st.User.password: new_password, st.User.token: token, st.User.terminal: terminal}
         )
         if query1 == 0:
             return error.error_authorization_fail()
 
-        session.commit()
+        db.session.commit()
     except exc.SQLAlchemyError as e:
         return 528, "{}".format(str(e))
     except BaseException as e:
