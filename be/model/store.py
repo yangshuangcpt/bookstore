@@ -1,63 +1,49 @@
 import logging
 import os
-import sqlite3 as sqlite
+from sqlalchemy import create_engine, ForeignKey, exc
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, TEXT,Boolean
+from sqlalchemy.orm import sessionmaker, scoped_session
+
+engine = create_engine('postgresql+psycopg2://postgres:Wypsz.01@localhost/bookstore', encoding='utf-8', echo=True)
+base = declarative_base()
 
 
-class Store:
-    database: str
-
-    def __init__(self, db_path):
-        self.database = os.path.join(db_path, "be.db")
-        self.init_tables()
-
-    def init_tables(self):
-        try:
-            conn = self.get_db_conn()
-            conn.execute(
-                "CREATE TABLE IF NOT EXISTS user ("
-                "user_id TEXT PRIMARY KEY, password TEXT NOT NULL, "
-                "balance INTEGER NOT NULL, token TEXT, terminal TEXT);"
-            )
-
-            conn.execute(
-                "CREATE TABLE IF NOT EXISTS user_store("
-                "user_id TEXT, store_id, PRIMARY KEY(user_id, store_id));"
-            )
-
-            conn.execute(
-                "CREATE TABLE IF NOT EXISTS store( "
-                "store_id TEXT, book_id TEXT, book_info TEXT, stock_level INTEGER,"
-                " PRIMARY KEY(store_id, book_id))"
-            )
-
-            conn.execute(
-                "CREATE TABLE IF NOT EXISTS new_order( "
-                "order_id TEXT PRIMARY KEY, user_id TEXT, store_id TEXT)"
-            )
-
-            conn.execute(
-                "CREATE TABLE IF NOT EXISTS new_order_detail( "
-                "order_id TEXT, book_id TEXT, count INTEGER, price INTEGER,  "
-                "PRIMARY KEY(order_id, book_id))"
-            )
-
-            conn.commit()
-        except sqlite.Error as e:
-            logging.error(e)
-            conn.rollback()
-
-    def get_db_conn(self) -> sqlite.Connection:
-        return sqlite.connect(self.database)
+class User(base):
+    __tablename__ = 'user'
+    user_id = Column('user_id', TEXT, primary_key=True)
+    password = Column('password', TEXT, nullable=False)
+    balance = Column('balance', Integer, nullable=False)
+    token = Column('token', TEXT)
+    terminal = Column('terminal ', TEXT)
 
 
-database_instance: Store = None
+class UserStore(base):
+    __tablename__ = 'user_store'
+    user_id = Column('user_id', TEXT, primary_key=True)
+    store_id = Column('store_id', TEXT, primary_key=True)
 
 
-def init_database(db_path):
-    global database_instance
-    database_instance = Store(db_path)
+class Store(base):
+    __tablename__ = 'store'
+    store_id = Column('store_id', Integer, primary_key=True)
+    book_id = Column('book_id', TEXT, primary_key=True)
+    book_info = Column('book_info', TEXT)
+    stock_level = Column('stock_level', Integer)
 
 
-def get_db_conn():
-    global database_instance
-    return database_instance.get_db_conn()
+class NewOrder(base):
+    __tablename__ = 'new_order'
+    order_id = Column('order_id', TEXT, primary_key=True)
+    user_id = Column('user_id', TEXT)
+    store_id = Column('store_id', TEXT)
+    status = Column('status',Integer)
+
+
+class NewOrderDetail(base):
+    __tablename__ = 'new_order_detail'
+    order_id = Column('order_id ', TEXT, primary_key=True)
+    book_id = Column('book_id', TEXT, primary_key=True)
+    count = Column('count ', Integer)
+    price = Column('price ', Integer)
+

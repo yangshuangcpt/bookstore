@@ -1,30 +1,31 @@
-from be.model import store
+import store
+from sqlalchemy.orm import sessionmaker
+
+Session = sessionmaker(bind=store.engine)
+session = Session()
+
+def user_id_exist(user_id):
+    query = session.query(store.User).filter(store.User.user_id == user_id)
+    row = query.one_or_none()
+    if row is None:
+        return False
+    else:
+        return True
 
 
-class DBConn:
-    def __init__(self):
-        self.conn = store.get_db_conn()
+def book_id_exist(store_id, book_id):
+    query = session.query(store.Store).filter(store.Store.store_id == store_id, Store.book_id == book_id)
+    row = query.one_or_none()
+    if row is None:
+        return False
+    else:
+        return True
 
-    def user_id_exist(self, user_id):
-        cursor = self.conn.execute("SELECT user_id FROM user WHERE user_id = ?;", (user_id,))
-        row = cursor.fetchone()
-        if row is None:
-            return False
-        else:
-            return True
 
-    def book_id_exist(self, store_id, book_id):
-        cursor = self.conn.execute("SELECT book_id FROM store WHERE store_id = ? AND book_id = ?;", (store_id, book_id))
-        row = cursor.fetchone()
-        if row is None:
-            return False
-        else:
-            return True
-
-    def store_id_exist(self, store_id):
-        cursor = self.conn.execute("SELECT store_id FROM user_store WHERE store_id = ?;", (store_id,))
-        row = cursor.fetchone()
-        if row is None:
-            return False
-        else:
-            return True
+def store_id_exist(store_id):
+    query = session.query(store.UserStore).filter(store.UserStore.store_id == store_id)
+    row = query.one_or_none()
+    if row is None:
+        return False
+    else:
+        return True
