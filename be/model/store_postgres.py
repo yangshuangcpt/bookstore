@@ -2,7 +2,7 @@ import logging
 import os
 from sqlalchemy import create_engine, ForeignKey, exc
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, VARCHAR, TEXT
+from sqlalchemy import Column, Integer, TEXT,Boolean
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 engine = create_engine('postgresql+psycopg2://postgres:Wypsz.01@localhost/bookstore', encoding='utf-8', echo=True)
@@ -37,6 +37,7 @@ class NewOrder(base):
     order_id = Column('order_id', TEXT, primary_key=True)
     user_id = Column('user_id', TEXT)
     store_id = Column('store_id', TEXT)
+    status = Column('status',Integer)
 
 
 class NewOrderDetail(base):

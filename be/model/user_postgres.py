@@ -10,7 +10,6 @@ import db_conn as db
 import store as st
 
 
-
 def jwt_encode(user_id: str, terminal: str) -> str:
     encoded = jwt.encode(
         {"user_id": user_id, "terminal": terminal, "timestamp": time.time()},
@@ -28,7 +27,7 @@ def jwt_decode(encoded_token, user_id: str) -> str:
 token_lifetime: int = 3600
 
 
-def check_token(user_id, db_token, token) -> bool:
+def _check_token(user_id, db_token, token) -> bool:
     try:
         if db_token != token:
             return False
@@ -54,13 +53,13 @@ def register(user_id: str, password: str):
     return 200, "ok"
 
 
-def check_token( user_id: str, token: str) -> (int, str):
+def check_token(user_id: str, token: str) -> (int, str):
     query1 = db.session.query(st.User).filter(st.User.user_id == user_id)
     row = query1.one_or_none()
     if row is None:
         return error.error_authorization_fail()
     db_token = row.token
-    if not check_token(user_id, db_token, token):
+    if not _check_token(user_id, db_token, token):
         return error.error_authorization_fail()
     return 200, "ok"
 

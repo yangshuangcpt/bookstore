@@ -33,7 +33,7 @@ def new_order(user_id: str, store_id: str, id_and_count: [(str, int)]) -> (int, 
                 return error.error_stock_level_low(book_id) + (order_id,)
 
             query2 = db.session.query(st.Store).filter(
-                st.Store.store_id == store_id, st.Store.book_id == book_id, st.Store.stock_level >= count).undate(
+                st.Store.store_id == store_id, st.Store.book_id == book_id, st.Store.stock_level >= count).update(
                 {st.Store.stock_level: st.Store.stock_level - count}
             )
             if query2 == 0:
@@ -103,7 +103,7 @@ def payment(user_id: str, password: str, order_id: str) -> (int, str):
         if query5 == 0:
             return error.error_not_sufficient_funds(order_id)
 
-        query6 = db.session.query(st.User).filter(st.User.user_id == buyer_id).update({st.User.balance: st.User.balance + total_price})
+        query6 = db.session.query(st.User).filter(st.User.user_id == seller_id).update({st.User.balance: st.User.balance + total_price})
 
         if query6 == 0:
             return error.error_non_exist_user_id(buyer_id)
@@ -137,7 +137,7 @@ def add_funds(user_id, password, add_value) -> (int, str):
         if row.password != password:
             return error.error_authorization_fail()
 
-        query2 = db.session.query(st.User).filter(st,User.user_id == user_id).update({st.User.balance: st.User.balance + add_value})
+        query2 = db.session.query(st.User).filter(st.User.user_id == user_id).update({st.User.balance: st.User.balance + add_value})
         if query2 == 0:
             return error.error_non_exist_user_id(user_id)
 
