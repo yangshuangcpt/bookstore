@@ -1,4 +1,4 @@
-import store
+from model import store
 from sqlalchemy.orm import sessionmaker
 
 Session = sessionmaker(bind=store.engine)
@@ -14,7 +14,7 @@ def user_id_exist(user_id):
 
 
 def book_id_exist(store_id, book_id):
-    query = session.query(store.Store).filter(store.Store.store_id == store_id, Store.book_id == book_id)
+    query = session.query(store.Store).filter(store.Store.store_id == store_id, store.Store.book_id == book_id)
     row = query.one_or_none()
     if row is None:
         return False

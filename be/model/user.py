@@ -1,13 +1,8 @@
 import jwt
 import time
 import logging
-from sqlalchemy import create_engine, ForeignKey, exc
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, VARCHAR, TEXT
-from sqlalchemy.orm import sessionmaker, scoped_session
-import error
-import db_conn as db
-import store as st
+from sqlalchemy import exc
+from model import db_conn as db, error, store as st
 
 
 def jwt_encode(user_id: str, terminal: str) -> str:
