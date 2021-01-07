@@ -1,5 +1,5 @@
 from sqlalchemy import exc
-from model import db_conn as db, error, store as st
+from be.model import db_conn as db, error, store as st
 
 
 # 添加书籍信息

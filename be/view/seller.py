@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import request
 from flask import jsonify
-from be.model.seller import *
+from be.model import seller
 import json
 
 bp_seller = Blueprint("seller", __name__, url_prefix="/seller")
@@ -11,7 +11,7 @@ bp_seller = Blueprint("seller", __name__, url_prefix="/seller")
 def seller_create_store():
     user_id: str = request.json.get("user_id")
     store_id: str = request.json.get("store_id")
-    code, message = create_store(user_id, store_id)
+    code, message = seller.create_store(user_id, store_id)
     return jsonify({"message": message}), code
 
 
@@ -21,7 +21,7 @@ def seller_add_book():
     store_id: str = request.json.get("store_id")
     book_info: str = request.json.get("book_info")
     stock_level: str = request.json.get("stock_level", 0)
-    code, message = add_book(user_id, store_id, book_info.get("id"), json.dumps(book_info), stock_level)
+    code, message = seller.add_book(user_id, store_id, book_info.get("id"), json.dumps(book_info), stock_level)
 
     return jsonify({"message": message}), code
 
@@ -32,6 +32,6 @@ def add_stock_level():
     store_id: str = request.json.get("store_id")
     book_id: str = request.json.get("book_id")
     add_num: str = request.json.get("add_stock_level", 0)
-    code, message = add_stock_level(user_id, store_id, book_id, add_num)
+    code, message = seller.add_stock_level(user_id, store_id, book_id, add_num)
 
     return jsonify({"message": message}), code

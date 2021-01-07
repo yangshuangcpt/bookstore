@@ -1,4 +1,4 @@
-from model import store
+from be.model import store
 from sqlalchemy.orm import sessionmaker
 
 Session = sessionmaker(bind=store.engine)

@@ -2,7 +2,7 @@ from sqlalchemy import exc
 import logging
 import uuid
 import json
-from model import db_conn as db, error, store as st
+from be.model import db_conn as db, error, store as st
 
 # 买家下单
 def new_order(user_id: str, store_id: str, id_and_count: [(str, int)]) -> (int, str, str):
@@ -115,20 +115,20 @@ def payment(user_id: str, password: str, order_id: str) -> (int, str):
         if query6 == 0:
             return error.error_non_exist_user_id(buyer_id)
 
-        # 付款完成，更改订单状态
-        query7 = db.session.query(st.NewOrder).filter(st.NewOrder.order_id == order_id).update(
-            {st.NewOrder.status: 1}
-        )
+        # # 付款完成，更改订单状态
+        # query7 = db.session.query(st.NewOrder).filter(st.NewOrder.order_id == order_id).update(
+        #     {st.NewOrder.status: 1}
+        # )
 
-        # 订单完成删除两个表中的订单信息
-        # query7 = db.session.query(st.NewOrder).filter(st.NewOrder.order_id == order_id).delete()
-        # if query7 == 0:
-        #    return error.error_invalid_order_id(order_id)
+        订单完成删除两个表中的订单信息
+        query7 = db.session.query(st.NewOrder).filter(st.NewOrder.order_id == order_id).delete()
+        if query7 == 0:
+           return error.error_invalid_order_id(order_id)
 
-        # query8 = db.session.query(st.NewOrderDetail).filter(st.NewOrderDetail.order_id == order_id).delete()
-        # if query8 == 0:
-        #    return error.error_invalid_order_id(order_id)
-        # db.session.commit()
+        query8 = db.session.query(st.NewOrderDetail).filter(st.NewOrderDetail.order_id == order_id).delete()
+        if query8 == 0:
+           return error.error_invalid_order_id(order_id)
+        db.session.commit()
 
     except exc.SQLAlchemyError as e:
         return 528, "{}".format(str(e))

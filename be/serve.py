@@ -29,6 +29,8 @@ def be_run():
     log_file = os.path.join(parent_path, "app.log")
     store_path = os.path.join(parent_path, "be\\model\\store.py")
     os.system("python " + store_path)
+    # insert_path = os.path.join(parent_path, "be\\model\\insert_data.py")
+    # os.system("python " + insert_path)
 
     logging.basicConfig(filename=log_file, level=logging.ERROR)
     handler = logging.StreamHandler()

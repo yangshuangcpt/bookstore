@@ -2,7 +2,7 @@ import jwt  # 用户认证
 import time
 import logging
 from sqlalchemy import exc
-from model import db_conn as db, error, store as st
+from be.model import db_conn as db, error, store as st
 
 
 def jwt_encode(user_id: str, terminal: str) -> str:  # ->是函数返回类型的注释，无实际意义
@@ -11,7 +11,7 @@ def jwt_encode(user_id: str, terminal: str) -> str:  # ->是函数返回类型�
         key=user_id,
         algorithm="HS256",
     )
-    return encoded.decode("utf-8")  # 以utf-8解码
+    return encoded   # .decode("utf-8")  # 以utf-8解码
 
 
 def jwt_decode(encoded_token, user_id: str) -> str:

@@ -5,12 +5,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, TEXT, Boolean
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-engine = create_engine('postgresql+psycopg2://postgres:Wypsz.01@localhost/bookstore', encoding='utf-8', echo=True)
+engine = create_engine('postgresql+psycopg2://postgres:cpt1005,@localhost/bookstore', encoding='utf-8', echo=True)
 base = declarative_base()
 
 
 class User(base):
-    __tablename__ = 'user'
+    __tablename__ = 'users'  # postgres中表格名不能为user
     user_id = Column('user_id', TEXT, primary_key=True)
     password = Column('password', TEXT, nullable=False)
     balance = Column('balance', Integer, nullable=False)  # 余额
