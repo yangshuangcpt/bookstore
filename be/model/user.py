@@ -1,17 +1,17 @@
-import jwt
+import jwt  # 用户认证
 import time
 import logging
 from sqlalchemy import exc
 from model import db_conn as db, error, store as st
 
 
-def jwt_encode(user_id: str, terminal: str) -> str:
-    encoded = jwt.encode(
+def jwt_encode(user_id: str, terminal: str) -> str:  # ->是函数返回类型的注释，无实际意义
+    encoded = jwt.encode(   # 生成 jwt， bytes 类型的 base64 编码
         {"user_id": user_id, "terminal": terminal, "timestamp": time.time()},
         key=user_id,
         algorithm="HS256",
     )
-    return encoded.decode("utf-8")
+    return encoded.decode("utf-8")  # 以utf-8解码
 
 
 def jwt_decode(encoded_token, user_id: str) -> str:
@@ -19,9 +19,18 @@ def jwt_decode(encoded_token, user_id: str) -> str:
     return decoded
 
 
-token_lifetime: int = 3600
+token_lifetime: int = 3600  # 3600 second
 
 
+# decode a JWT to a json string like:
+#   {
+#       "user_id": [user name],
+#       "terminal": [terminal code],
+#       "timestamp": [ts]} to a JWT
+#   }
+
+
+# 检查token是否有效
 def _check_token(user_id, db_token, token) -> bool:
     try:
         if db_token != token:
@@ -30,13 +39,14 @@ def _check_token(user_id, db_token, token) -> bool:
         ts = jwt_text["timestamp"]
         if ts is not None:
             now = time.time()
-            if token_lifetime > now - ts >= 0:
+            if token_lifetime > now - ts >= 0:  # token有效
                 return True
     except jwt.exceptions.InvalidSignatureError as e:
         logging.error(str(e))
         return False
 
 
+# 用户注册
 def register(user_id: str, password: str):
     try:
         terminal = "terminal_{}".format(str(time.time()))
@@ -70,6 +80,7 @@ def check_password(user_id: str, password: str) -> (int, str):
     return 200, "ok"
 
 
+# 用户登录
 def login(user_id: str, password: str, terminal: str) -> (int, str, str):
     token = ""
     try:
@@ -91,7 +102,8 @@ def login(user_id: str, password: str, terminal: str) -> (int, str, str):
     return 200, "ok", token
 
 
-def logout(user_id: str, token: str) -> bool:
+# 退出登录
+def logout(user_id: str, token: str) -> (int, str):  # 此处原本是bool
     try:
         code, message = check_token(user_id, token)
         if code != 200:
@@ -114,6 +126,7 @@ def logout(user_id: str, token: str) -> bool:
     return 200, "ok"
 
 
+# 用户注销
 def unregister(user_id: str, password: str) -> (int, str):
     try:
         code, message = check_password(user_id, password)
@@ -132,7 +145,8 @@ def unregister(user_id: str, password: str) -> (int, str):
     return 200, "ok"
 
 
-def change_password(user_id: str, old_password: str, new_password: str) -> bool:
+# 更改密码
+def change_password(user_id: str, old_password: str, new_password: str) -> (int, str):  # 此处原本是bool
     try:
         code, message = check_password(user_id, old_password)
         if code != 200:

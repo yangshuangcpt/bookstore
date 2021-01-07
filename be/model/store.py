@@ -13,9 +13,9 @@ class User(base):
     __tablename__ = 'user'
     user_id = Column('user_id', TEXT, primary_key=True)
     password = Column('password', TEXT, nullable=False)
-    balance = Column('balance', Integer, nullable=False)
-    token = Column('token', TEXT)
-    terminal = Column('terminal ', TEXT)
+    balance = Column('balance', Integer, nullable=False)  # 余额
+    token = Column('token', TEXT)  # 登录缓存令牌
+    terminal = Column('terminal ', TEXT)  # 标记终端
 
 
 class UserStore(base):
@@ -37,7 +37,7 @@ class NewOrder(base):
     order_id = Column('order_id', TEXT, primary_key=True)
     user_id = Column('user_id', TEXT)
     store_id = Column('store_id', TEXT)
-    status = Column('status', Integer)
+    status = Column('status', Integer)  # ?
 
 
 class NewOrderDetail(base):
@@ -48,4 +48,4 @@ class NewOrderDetail(base):
     price = Column('price ', Integer)
 
 
-base.metadata.create_all(engine)
+base.metadata.create_all(engine)  # 创建表结构

@@ -4,7 +4,7 @@ import uuid
 import json
 from model import db_conn as db, error, store as st
 
-
+# 买家下单
 def new_order(user_id: str, store_id: str, id_and_count: [(str, int)]) -> (int, str, str):
     order_id = ""
     try:
@@ -30,7 +30,7 @@ def new_order(user_id: str, store_id: str, id_and_count: [(str, int)]) -> (int, 
             # 减少书店中书的库存量
             query2 = db.session.query(st.Store).filter(
                 st.Store.store_id == store_id, st.Store.book_id == book_id, st.Store.stock_level >= count).update(
-                {st.Store.stock_level: st.Store.stock_level - count}
+                {st.Store.stock_level: st.Store.stock_level - count}, synchronize_session="evaluate"
             )
             if query2 == 0:
                 return error.error_stock_level_low(book_id) + (order_id,)
@@ -42,6 +42,7 @@ def new_order(user_id: str, store_id: str, id_and_count: [(str, int)]) -> (int, 
         db.session.add(st.NewOrder(order_id=uid, store_id=store_id, user_id=user_id, status=0))
         db.session.commit()
         order_id = uid
+
     except exc.SQLAlchemyError as e:
         logging.info("528, {}".format(str(e)))
         return 528, "{}".format(str(e)), ""
@@ -52,6 +53,7 @@ def new_order(user_id: str, store_id: str, id_and_count: [(str, int)]) -> (int, 
     return 200, "ok", order_id
 
 
+# 买家付款
 def payment(user_id: str, password: str, order_id: str) -> (int, str):
     # conn = self.conn
     try:
@@ -101,14 +103,14 @@ def payment(user_id: str, password: str, order_id: str) -> (int, str):
 
         # 买家账户扣钱
         query5 = db.session.query(st.User).filter(st.User.user_id == buyer_id, st.User.balance >= total_price).update(
-            {st.User.balance: st.User.balance - total_price})
+            {st.User.balance: st.User.balance - total_price}, synchronize_session="evaluate")
 
         if query5 == 0:
             return error.error_not_sufficient_funds(order_id)
 
         # 卖家账户加钱
         query6 = db.session.query(st.User).filter(st.User.user_id == seller_id).update(
-            {st.User.balance: st.User.balance + total_price})
+            {st.User.balance: st.User.balance + total_price}, synchronize_session="evaluate")
 
         if query6 == 0:
             return error.error_non_exist_user_id(buyer_id)
@@ -137,6 +139,7 @@ def payment(user_id: str, password: str, order_id: str) -> (int, str):
     return 200, "ok"
 
 
+# 买家充值
 def add_funds(user_id, password, add_value) -> (int, str):
     try:
         query1 = db.session.query(st.User).filter(st.User.user_id == user_id)
@@ -148,11 +151,12 @@ def add_funds(user_id, password, add_value) -> (int, str):
             return error.error_authorization_fail()
 
         query2 = db.session.query(st.User).filter(st.User.user_id == user_id).update(
-            {st.User.balance: st.User.balance + add_value})
+            {st.User.balance: st.User.balance + add_value}, synchronize_session="evaluate")
         if query2 == 0:
             return error.error_non_exist_user_id(user_id)
 
         db.session.commit()
+        
     except exc.SQLAlchemyError as e:
         return 528, "{}".format(str(e))
     except BaseException as e:
