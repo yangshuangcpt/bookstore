@@ -4,6 +4,7 @@ import uuid
 import json
 from be.model import db_conn as db, error, store as st
 
+
 # 买家下单
 def new_order(user_id: str, store_id: str, id_and_count: [(str, int)]) -> (int, str, str):
     order_id = ""
@@ -64,7 +65,7 @@ def payment(user_id: str, password: str, order_id: str) -> (int, str):
             return error.error_invalid_order_id(order_id)
 
         order_id = row.order_id
-        buyer_id = row.buyer_id
+        buyer_id = row.user_id
         store_id = row.store_id
 
         if buyer_id != user_id:
@@ -120,14 +121,14 @@ def payment(user_id: str, password: str, order_id: str) -> (int, str):
         #     {st.NewOrder.status: 1}
         # )
 
-        订单完成删除两个表中的订单信息
+        # 订单完成删除两个表中的订单信息
         query7 = db.session.query(st.NewOrder).filter(st.NewOrder.order_id == order_id).delete()
         if query7 == 0:
-           return error.error_invalid_order_id(order_id)
+            return error.error_invalid_order_id(order_id)
 
         query8 = db.session.query(st.NewOrderDetail).filter(st.NewOrderDetail.order_id == order_id).delete()
         if query8 == 0:
-           return error.error_invalid_order_id(order_id)
+            return error.error_invalid_order_id(order_id)
         db.session.commit()
 
     except exc.SQLAlchemyError as e:

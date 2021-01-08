@@ -112,7 +112,7 @@ def logout(user_id: str, token: str) -> (int, str):  # 此处原本是bool
         terminal = "terminal_{}".format(str(time.time()))
         dummy_token = jwt_encode(user_id, terminal)
 
-        query1 = db.ession.query(st.User).filter(st.User.user_id == user_id).update(
+        query1 = db.session.query(st.User).filter(st.User.user_id == user_id).update(
             {st.User.token: dummy_token, st.User.terminal: terminal}
         )
         if query1 == 0:
