@@ -2,10 +2,11 @@ import logging
 import os
 from sqlalchemy import create_engine, ForeignKey, exc
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, TEXT, Boolean
+from sqlalchemy import Column, Integer, TEXT, Boolean,DateTime
 from sqlalchemy.orm import sessionmaker, scoped_session
+import time
 
-engine = create_engine('postgresql+psycopg2://postgres:cpt1005,@localhost/bookstore', encoding='utf-8', echo=True)
+engine = create_engine('postgresql+psycopg2://postgres:Wypsz.01@localhost/bookstore', encoding='utf-8', echo=True)
 base = declarative_base()
 
 
@@ -47,5 +48,10 @@ class NewOrderDetail(base):
     count = Column('count ', Integer)
     price = Column('price ', Integer)
 
+
+class NotPayOrder(base):
+    __tablename__ = 'not_pay_order'
+    order_id = Column('order_id', TEXT, primary_key=True)
+    ddl = Column('ddl', DateTime, nullable=False)  # ?
 
 base.metadata.create_all(engine)  # 创建表结构

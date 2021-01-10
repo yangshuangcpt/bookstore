@@ -1,9 +1,7 @@
 from be.model import store
 from sqlalchemy.orm import sessionmaker
-
 Session = sessionmaker(bind=store.engine)
 session = Session()
-
 
 def user_id_exist(user_id):  # 检查user_id是否存在
     query = session.query(store.User).filter(store.User.user_id == user_id)

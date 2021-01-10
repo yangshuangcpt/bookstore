@@ -1,5 +1,10 @@
+import json
+
 import requests
 from urllib.parse import urljoin
+
+import simplejson
+
 from fe.access import book
 from fe.access.auth import Auth
 
@@ -19,7 +24,7 @@ class Seller:
             "user_id": self.seller_id,
             "store_id": store_id,
         }
-        #print(simplejson.dumps(json))
+        # print(simplejson.dumps(json))
         url = urljoin(self.url_prefix, "create_store")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
@@ -32,7 +37,7 @@ class Seller:
             "book_info": book_info.__dict__,
             "stock_level": stock_level
         }
-        #print(simplejson.dumps(json))
+        # print(simplejson.dumps(json))
         url = urljoin(self.url_prefix, "add_book")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
@@ -45,8 +50,18 @@ class Seller:
             "book_id": book_id,
             "add_stock_level": add_stock_num
         }
-        #print(simplejson.dumps(json))
+        # print(simplejson.dumps(json))
         url = urljoin(self.url_prefix, "add_stock_level")
+        headers = {"token": self.token}
+        r = requests.post(url, headers=headers, json=json)
+        return r.status_code
+
+    def receiving(self, seller_id: str, order_id: str) -> int:
+        json = {
+            "user_id": seller_id,
+            "order_id": order_id
+        }
+        url = urljoin(self.url_prefix, "receiving")
         headers = {"token": self.token}
         r = requests.post(url, headers=headers, json=json)
         return r.status_code
