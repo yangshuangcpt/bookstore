@@ -1,3 +1,5 @@
+import time
+
 import pytest
 
 from fe.access.buyer import Buyer
@@ -68,3 +70,5 @@ class TestPayment:
 
         code = self.buyer.payment(self.order_id)
         assert code != 200
+
+

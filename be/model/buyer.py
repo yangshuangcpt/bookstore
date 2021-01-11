@@ -1,3 +1,5 @@
+import time
+
 from sqlalchemy import exc
 import logging
 import uuid
@@ -45,7 +47,7 @@ def new_order(user_id: str, store_id: str, id_and_count: [(str, int)]) -> (int, 
         # 新增一条订单信息
         db.session.add(st.NewOrder(order_id=uid, store_id=store_id, user_id=user_id, status=0))
         # 新增一条未付款订单消息
-        time = datetime.datetime.utcnow() + datetime.timedelta(minutes=5)
+        time = datetime.datetime.utcnow() + datetime.timedelta(seconds=10)
         db.session.add(st.NotPayOrder(order_id=uid, ddl=time))
         db.session.commit()
         order_id = uid
@@ -190,19 +192,14 @@ def shipping(user_id: str, order_id: str):
         row = query1.one_or_none()
         if row is None:
             return error.error_invalid_order_id(order_id)
-        # 订单的买卖家信息是否正确
-        if not row.user_id == user_id:
-            return error.error_authorization_fail()
         # 查看订单是否发货
         if row.status != 2:
             return error.error_not_receive(order_id)
 
         # 订单完成，更改订单状态
-        query2 = db.session.query(st.NewOrder).filter(st.NewOrder.order_id == order_id).update(
+        db.session.query(st.NewOrder).filter(st.NewOrder.order_id == order_id).update(
             {st.NewOrder.status: 3}
         )
-        if query2 == 0:
-            return error.error_invalid_order_id(order_id)
         db.session.commit()
 
     except exc.SQLAlchemyError as e:
@@ -312,23 +309,28 @@ def cancel_order(buyer_id: str, order_id: str):
 
 def auto_cancel_order():
     # time = datetime.utcnow() + datetime.timedelta(minutes=5)
-    now = datetime.datetimeutcnow()
-    query = db.session.query(st.NotPayOrder).filter(st.NotPayOrder(st.NotPayOrder.ddl >= now)).all()
+    create_timer()
+    print('hello')
+    now = datetime.datetime.utcnow()
+    query = db.session.query(st.NotPayOrder).filter(st.NotPayOrder.ddl <= now).all()
+    print(len(query))
     if len(query) > 0:
         for row in query:
             order_id = row.order_id
-            db.session.query(st.NotPayOrder).filter(st.NotPayOrder == order_id).delete()
+            print(order_id)
+            q = db.session.query(st.NotPayOrder).filter(st.NotPayOrder == order_id).delete()
             # 更改这些订单的状态
+            if q!=0:
+                print("delete")
             query1 = db.session.query(st.NewOrder).filter(st.NewOrder.order_id == order_id).update(
                 {st.NewOrder.status: -1}
             )
         db.session.commit()
-    else:
-        return 'no order to cancel'
-    return 'ok'
+        #time.sleep(1)
 
 
 def create_timer():
-    while True:
-        timer = threading.Timer(1, auto_cancel_order())
-        timer.start()
+    t = threading.Timer(1,auto_cancel_order)
+    t.start()
+
+create_timer()

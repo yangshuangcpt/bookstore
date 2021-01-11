@@ -51,10 +51,19 @@ def register(user_id: str, password: str):
     try:
         terminal = "terminal_{}".format(str(time.time()))
         token = jwt_encode(user_id, terminal)
-        db.session.add(st.User(user_id=user_id, password=password, balance=0, token=token, terminal=terminal))
+        query1 = db.session.query(st.User).filter(st.User.user_id==user_id).one_or_none()
+        if query1 is not None:
+            # db.session.add(st.User(user_id=user_id, password=password, balance=0, token=token, terminal=terminal))
+            # db.session.commit()
+            return error.error_exist_user_id(user_id)
+
+        obj=st.User(user_id=user_id, password=password, balance=0, token=token, terminal=terminal)
+        db.session.add(obj)
+        print(user_id)
         db.session.commit()
-    except exc.SQLAlchemyError:
-        return error.error_exist_user_id(user_id)
+    except exc.SQLAlchemyError as e:
+        print (e)
+        return error.error_exist_user_id(user_id,e)
     return 200, "ok"
 
 

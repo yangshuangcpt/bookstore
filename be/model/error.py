@@ -25,7 +25,8 @@ def error_non_exist_user_id(user_id):
     return 511, error_code[511].format(user_id)
 
 
-def error_exist_user_id(user_id):
+def error_exist_user_id(user_id,e):
+    print(e)
     return 512, error_code[512].format(user_id)
 
 
