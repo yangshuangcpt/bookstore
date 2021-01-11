@@ -89,6 +89,10 @@ bookstore
 安装依赖
 
     pip install -r requirements.txt
+    python ./insertdata/store.py
+    python ./insertdata/insert_books.py
+    python ./insertdata/insert_search_book.py
+    python ./insertdata/insert_store.py
 
 
 执行测试
@@ -96,6 +100,8 @@ bookstore
     bash script/test.sh
 
  
+
+
 
 
  bookstore/fe/data/book.db中包含测试的数据，从豆瓣网抓取的图书信息，
@@ -123,6 +129,8 @@ bookstore
     );
 
    
+
+
 
 
 更多的数据可以从网盘下载，下载地址为，链接：

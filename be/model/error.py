@@ -11,10 +11,10 @@ error_code = {
     519: "not sufficient funds, order id {}",
     520: "did not pay, order id {}",
     521: "did not receive, order id {}",
-    522: "",
-    523: "",
-    524: "",
-    525: "",
+    522: "did not have this title {}",
+    523: "did not have this author {}",
+    524: "did not have this tags {}",
+    525: "did not have this details {}",
     526: "",
     527: "",
     528: "",
@@ -25,8 +25,7 @@ def error_non_exist_user_id(user_id):
     return 511, error_code[511].format(user_id)
 
 
-def error_exist_user_id(user_id,e):
-    print(e)
+def error_exist_user_id(user_id):
     return 512, error_code[512].format(user_id)
 
 
@@ -64,6 +63,22 @@ def error_not_pay(order_id):
 
 def error_not_receive(order_id):
     return 521, error_code[521].format(order_id)
+
+
+def error_no_title(title):
+    return 522, error_code[522].format(title)
+
+
+def error_no_author(author):
+    return 523, error_code[523].format(author)
+
+
+def error_no_tags(tags):
+    return 524, error_code[524].format(tags)
+
+
+def error_no_details(details):
+    return 525, error_code[525].format(details)
 
 
 def error_authorization_fail():

@@ -6,6 +6,7 @@ from flask import request
 from be.view import auth
 from be.view import seller
 from be.view import buyer
+from be.view import search
 
 bp_shutdown = Blueprint("shutdown", __name__)
 
@@ -27,10 +28,18 @@ def be_run():
     this_path = os.path.dirname(__file__)
     parent_path = os.path.dirname(this_path)
     log_file = os.path.join(parent_path, "app.log")
-    store_path = os.path.join(parent_path, "be\\model\\store.py")
-    os.system("python " + store_path)
-    # insert_path = os.path.join(parent_path, "be\\model\\insert_data.py")
-    # os.system("python " + insert_path)
+
+    # store_path = os.path.join(parent_path, "be\\model\\store.py")
+    # os.system("python " + store_path)
+    #
+    # insert_book_path = os.path.join(parent_path, "be\\model\\insert_books.py")
+    # os.system("python " + insert_book_path)
+    #
+    # insert_search_path = os.path.join(parent_path, "be\\model\\insert_search_book.py")
+    # os.system("python " + insert_search_path)
+    #
+    # insert_store_path = os.path.join(parent_path, "be\\model\\insert_store.py")
+    # os.system("python " + insert_store_path)
 
     logging.basicConfig(filename=log_file, level=logging.ERROR)
     handler = logging.StreamHandler()
@@ -45,4 +54,5 @@ def be_run():
     app.register_blueprint(auth.bp_auth)
     app.register_blueprint(seller.bp_seller)
     app.register_blueprint(buyer.bp_buyer)
+    app.register_blueprint(search.bp_search)
     app.run()
