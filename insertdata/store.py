@@ -38,7 +38,7 @@ class NewOrder(base):
     order_id = Column('order_id', TEXT, primary_key=True)
     user_id = Column('user_id', TEXT)
     store_id = Column('store_id', TEXT)
-    status = Column('status', Integer)  # ?
+    status = Column('status', Integer)
 
 
 class NewOrderDetail(base):
@@ -52,7 +52,7 @@ class NewOrderDetail(base):
 class NotPayOrder(base):
     __tablename__ = 'not_pay_order'
     order_id = Column('order_id', TEXT, primary_key=True)
-    ddl = Column('ddl', DateTime, nullable=False)  # ?
+    ddl = Column('ddl', DateTime, nullable=False)
 
 
 class Book(base):

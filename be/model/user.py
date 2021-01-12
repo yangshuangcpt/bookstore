@@ -53,17 +53,14 @@ def register(user_id: str, password: str):
         token = jwt_encode(user_id, terminal)
         query1 = db.session.query(st.User).filter(st.User.user_id==user_id).one_or_none()
         if query1 is not None:
-            # db.session.add(st.User(user_id=user_id, password=password, balance=0, token=token, terminal=terminal))
-            # db.session.commit()
             return error.error_exist_user_id(user_id)
-
         obj=st.User(user_id=user_id, password=password, balance=0, token=token, terminal=terminal)
         db.session.add(obj)
         print(user_id)
         db.session.commit()
     except exc.SQLAlchemyError as e:
-        print (e)
-        return error.error_exist_user_id(user_id,e)
+        print(e)
+        return error.error_exist_user_id(user_id, e)
     return 200, "ok"
 
 
@@ -96,7 +93,6 @@ def login(user_id: str, password: str, terminal: str) -> (int, str, str):
         code, message = check_password(user_id, password)
         if code != 200:
             return code, message, ""
-
         token = jwt_encode(user_id, terminal)
         query1 = db.session.query(st.User).filter(st.User.user_id == user_id).update(
             {st.User.token: token, st.User.terminal: terminal}
@@ -117,7 +113,6 @@ def logout(user_id: str, token: str) -> (int, str):  # 此处原本是bool
         code, message = check_token(user_id, token)
         if code != 200:
             return code, message
-
         terminal = "terminal_{}".format(str(time.time()))
         dummy_token = jwt_encode(user_id, terminal)
 
@@ -126,7 +121,6 @@ def logout(user_id: str, token: str) -> (int, str):  # 此处原本是bool
         )
         if query1 == 0:
             return error.error_authorization_fail()
-
         db.session.commit()
     except exc.SQLAlchemyError as e:
         return 528, "{}".format(str(e))
@@ -160,7 +154,6 @@ def change_password(user_id: str, old_password: str, new_password: str) -> (int,
         code, message = check_password(user_id, old_password)
         if code != 200:
             return code, message
-
         terminal = "terminal_{}".format(str(time.time()))
         token = jwt_encode(user_id, terminal)
         query1 = db.session.query(st.User).filter(st.User.user_id == user_id).update(
@@ -168,7 +161,6 @@ def change_password(user_id: str, old_password: str, new_password: str) -> (int,
         )
         if query1 == 0:
             return error.error_authorization_fail()
-
         db.session.commit()
     except exc.SQLAlchemyError as e:
         return 528, "{}".format(str(e))

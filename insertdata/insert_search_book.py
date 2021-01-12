@@ -1,7 +1,9 @@
 # coding: utf-8
-import re
 import sys
-sys.path.append('C:\\Users\\dell\\Desktop\\bookstore')
+import os
+this_path = os.path.dirname(__file__)
+root_path = os.path.dirname(this_path)
+sys.path.append(root_path)
 from be.model import store
 from sqlalchemy.orm import sessionmaker
 import os
@@ -9,6 +11,7 @@ import sqlite3 as sqlite  # 只是为了读取book.db文件
 from be.model import store
 import jieba
 import jieba.analyse
+import re
 Session = sessionmaker(bind=store.engine)
 session = Session()
 

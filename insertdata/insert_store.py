@@ -1,5 +1,8 @@
 import sys
-sys.path.append('C:\\Users\\dell\\Desktop\\bookstore')
+import os
+this_path = os.path.dirname(__file__)
+root_path = os.path.dirname(this_path)
+sys.path.append(root_path)
 from be.model import store
 from sqlalchemy.orm import sessionmaker
 from be.model import user

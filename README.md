@@ -93,13 +93,18 @@ bookstore
     python ./insertdata/insert_books.py
     python ./insertdata/insert_search_book.py
     python ./insertdata/insert_store.py
+    开始运行前请先注释掉be.model.buyer的最后一行create_timer()，并修改数据库的密码
 
 
 执行测试
     
-    bash script/test.sh
+    bash script/test.sh		测试pass的结果
+    coverage report			测试覆盖率
+    在fe.bench.workload中class前添加logging.basicConfig(level=logging.INFO, filename='bench.log')这一行，并将fe.bench.run中注释掉的代码取消注释。
+    运行app.py,之后再运行fe.bench中的run.py		测试吞吐量和延迟
 
  
+
 
 
 
@@ -133,6 +138,7 @@ bookstore
 
 
 
+
 更多的数据可以从网盘下载，下载地址为，链接：
 
     https://pan.baidu.com/s/1bjCOW8Z5N_ClcqU54Pdt8g
@@ -142,10 +148,3 @@ bookstore
     hj6q
 
 这份数据同bookstore/fe/data/book.db的schema相同，但是有更多的数据(约3.5GB, 40000+行)
-
-
-
-hello wypsz
-
-hello yscpt
-

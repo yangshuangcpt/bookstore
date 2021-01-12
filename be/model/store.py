@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, TEXT, Boolean, LargeBinary, DateTime
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-engine = create_engine('postgresql+psycopg2://postgres:cpt1005,@localhost/bookstore', encoding='utf-8', echo=True)
+engine = create_engine('postgresql+psycopg2://postgres:123@localhost/bookstore', encoding='utf-8', echo=True)
 base = declarative_base()
 
 
@@ -38,7 +38,7 @@ class NewOrder(base):
     order_id = Column('order_id', TEXT, primary_key=True)
     user_id = Column('user_id', TEXT)
     store_id = Column('store_id', TEXT)
-    status = Column('status', Integer)  # ?
+    status = Column('status', Integer)
 
 
 class NewOrderDetail(base):
